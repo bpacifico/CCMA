@@ -1,3 +1,6 @@
+// Example based on the Baum-Shokrollahi construction of
+// an algorithm for multiplication the extension of the degree 4 extension of F_4
+
 ////////// Initialisation /////////////
 
 F4<w>:=GF(4);      
@@ -42,7 +45,7 @@ BD4;
 B2D4;
 
 //Definition of the set of places P
-PP:=[LP1[j]: j in [1..5]] cat [LP1[j]: j in [7..9]];
+PP:=[LP1[j]: j in [1..5]] cat [LP1[j]: j in [7..9]];  // Note that this is not necessarily exactly the places used by Baum and Shokrollahi 
 
 E:= [];
 for P in PP do
@@ -130,7 +133,7 @@ end for;
 XY eq Z;
 
 
-// Matrices 
+// Matrices required to perform the algorithm 
 
 "T_D";
 EvP*EvDQ4;
