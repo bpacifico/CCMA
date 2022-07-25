@@ -1,0 +1,141 @@
+////////// Initialisation /////////////
+
+F4<w>:=GF(4);      
+Kx<x> := FunctionField(F4);
+Kxy<y> := PolynomialRing(Kx);
+f:=y^2+y-x^3-1;             // Curve equation
+F<c> := FunctionField(f);   // Definition of the function field
+
+// Construction of the places of F
+LP1:=Places(F,1);
+//LP4:=Places(F,4);
+
+
+
+// Definition of the divisor D;
+DD:= x^2+x+w;
+D:= Decomposition(F,Zeros(Kx!DD)[1])[1];
+D4:=1*D;
+DD4:=2*D;
+//"dim L(D) is ", Dimension(D);
+"D=",D;
+"degree of D is ", Degree(D);
+
+//Definition of K4=F4^4 as the residue class field at Q4
+QQ := x^4 + x^3 + w*x^2 + w*x + w;
+Q4 := Decomposition(F,Zeros(Kx!QQ)[1])[1];
+K4<b4>:=ResidueClassField(Q4);
+B4:=Basis(K4,F4);
+"Q4=",Q4;
+"Basis of F4^4:";
+B4;
+
+
+//"Definition of the RR spaces";
+LD4, h4 :=RiemannRochSpace(D4);
+BD4 := h4(Basis(LD4));
+L2D4, hh4 :=RiemannRochSpace(DD4);
+B2D4 := hh4(Basis(L2D4));
+"Basis of L(D)";
+BD4;
+"Basis of L(2D)";
+B2D4;
+
+//Definition of the set of places P
+PP:=[LP1[j]: j in [1..5]] cat [LP1[j]: j in [7..9]];
+
+E:= [];
+for P in PP do
+    for i in [1..4] do
+        E:=Append(E,Evaluate(BD4[i],P));
+    end for;
+end for;
+EvP:=Matrix(F4,8,4,E);
+//"Evulation Ev_P FROM L(D)";
+//EvP;
+
+E:= [];
+for P in PP do
+    for i in [1..8] do
+        E:=Append(E,Evaluate(B2D4[i],P));
+    end for;
+end for;
+E:=Matrix(F4,8,8,E);
+//"Evaluation Ev_P^-1 back to L(2D)";
+EvPi:=E^-1;
+//EvPi;
+
+
+/////////////// Manipulate Elements in F4^4 /////////
+
+//"The Basis of F4^4 is ";B4;
+
+//////Random Element in F4^4
+X:=Random(K4);
+Xlist:=ElementToSequence(X); // Written in vector in the bases B4
+
+XX:=0;
+for i:=1 to 4 do
+    XX:=XX+Xlist[i]*B4[i];
+end for;
+// XX is X reconstructed from the vector in the Basis B4
+//XX eq X ;
+
+
+/////////////// EvQ /////////////////
+//"FROM L(2D)";
+EQ4:=[];
+for i:= 1 to 2*4 do     
+    EQ4:=Append(EQ4,ElementToSequence(Evaluate(B2D4[i],Q4)));
+end for;
+EQ4:=Matrix(F4,2*4,4,EQ4);
+Ev2DQ4:=Transpose(EQ4);
+//Ev2DQ4;
+
+
+//"FROM L(D)";
+EQ4:=[];
+for i:= 1 to 4 do     
+    EQ4:=Append(EQ4,ElementToSequence(Evaluate(BD4[i],Q4)));
+end for;
+EvDQ4:=Transpose(Matrix(F4,4,4,EQ4));
+
+
+
+///////////// ALGORITHM ////////////
+X:=Random(K4);
+Y:=Random(K4);
+Z:=X*Y; // Z est le produit XY
+X:=Transpose(Matrix(Vector(ElementToSequence(X))));
+Y:=Transpose(Matrix(Vector(ElementToSequence(Y))));  // Lets multiply X and Y
+
+// ALLER
+EVX:=EvP*EvDQ4^-1*X;
+EVY:=EvP*EvDQ4^-1*Y;
+
+/// HADAMARD PRODUCT
+H:=ZeroMatrix(F4,8,1);
+for i:=1 to 8 do 
+    H[i]:=EVX[i]*EVY[i];
+end for;
+
+// RETOUR
+Result:=Ev2DQ4*EvPi*H;
+XY:=K4!0;
+for i:=1 to 4 do 
+    XY:=XY+B4[i]*Result[i,1];
+end for;
+
+"TEST";
+XY eq Z;
+
+
+// Matrices 
+
+"T_D";
+EvP*EvDQ4;
+
+"CT_{2D}^{-1}";
+Ev2DQ4*EvPi;
+
+
